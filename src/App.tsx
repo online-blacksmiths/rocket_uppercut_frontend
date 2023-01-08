@@ -1,14 +1,7 @@
-import styled from 'styled-components';
-
 export default function App() {
-  const Title = styled.h1`
-    font-size: 32px;
-    color: #4e61ff;
-  `;
-
   return (
     <div>
-      <Title>로켓어퍼캇!!</Title>
+      <h1 className="text-[#4e61ff] text-4xl font-bold">로켓어퍼캇!!</h1>
     </div>
   );
 }
