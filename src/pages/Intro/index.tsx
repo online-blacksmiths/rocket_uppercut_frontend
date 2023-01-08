@@ -1,3 +1,11 @@
+import Layout from 'common/Layout';
+import Signup from 'pages/Signup';
+
 export default function Intro() {
-  return <section className="h-screen">this is intro</section>;
+  return (
+    <Layout title={null}>
+      <Signup />
+      <div>with intro</div>
+    </Layout>
+  );
 }
