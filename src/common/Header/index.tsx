@@ -9,7 +9,7 @@ export default function Header() {
           <Link to="/" className="w-8 aspect-square bg-[#4E61FF] rounded-full " />
         </article>
         <article className="flex items-center">
-          <Link to="/employ" className="text-sm p-3 hover:bg-gray-50">
+          <Link to="/employ" className="text-sm p-3 text-[#1A1A1A] hover:bg-gray-50">
             채용
           </Link>
           <div className="h-full content-none before:border-l before:border-[#D9DFEB] p-3" />
