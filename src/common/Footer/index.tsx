@@ -46,15 +46,18 @@ export default function Footer() {
       <section className="max-w-[1090px] w-full">
         <article className="flex justify-between">
           <ul className="flex gap-3">
-            {footerMenu.map(item => (
-              <li className="py-4 text-sm text-[#3c4858] hover:text-[#4E61FF] transition-colors cursor-pointer">
+            {footerMenu.map((item, index) => (
+              <li
+                key={index}
+                className="py-4 text-sm text-[#3c4858] hover:text-[#4E61FF] transition-colors cursor-pointer"
+              >
                 {item}
               </li>
             ))}
           </ul>
           <ul className="flex items-center">
-            {iconList.map(item => (
-              <li className="w-full">
+            {iconList.map((item, index) => (
+              <li key={index} className="w-full">
                 <img className="w-4 h-4 m-3" src={item} alt={item} />
               </li>
             ))}
@@ -62,15 +65,17 @@ export default function Footer() {
         </article>
         <article className="pt-3">
           <ul className="flex gap-3">
-            {businessInfo.map(item => (
-              <li className="text-xs text-[#6e7980]">{item}</li>
+            {businessInfo.map((item, index) => (
+              <li key={index} className="text-xs text-[#6e7980]">
+                {item}
+              </li>
             ))}
           </ul>
         </article>
         <article>
           <ul className="flex gap-3">
-            {githubInfo.map(({ text, url }) => (
-              <li>
+            {githubInfo.map(({ text, url }, index) => (
+              <li key={index}>
                 <a
                   href={url}
                   target="_blank"
