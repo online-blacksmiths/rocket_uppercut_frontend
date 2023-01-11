@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import signup from 'assets/create.svg';
@@ -8,6 +8,7 @@ import facebook from 'assets/facebook_login.svg';
 import Layout from 'common/Layout';
 import SignupForm from './signupForm';
 import useSignup from './hook/useSignup';
+import FullButton from 'components/FullButton';
 
 export default function Signup() {
   const [type, setType] = useState<string>('');
@@ -69,11 +70,11 @@ export default function Signup() {
                 </div>
               </div>
               <div className="flex flex-col space-y-2">
-                <button
-                  className="group w-full h-10 border rounded-md relative flex justify-center items-center hover:border-[#4E61FF] transition-colors"
-                  onClick={() => handlePhoneSignup()}
-                >
-                  <div className="w-10 h-10 aspect-square absolute left-0 flex justify-center items-center text-gray-600 group-hover:text-[#4E61FF] transition-colors">
+                <FullButton
+                  onClick={handlePhoneSignup}
+                  text="휴대전화로 회원가입"
+                  bgColor="white"
+                  icon={
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -88,16 +89,13 @@ export default function Signup() {
                         d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
                       />
                     </svg>
-                  </div>
-                  <span className="text-sm text-gray-600 group-hover:text-[#4E61FF] transition-colors">
-                    휴대전화로 회원가입
-                  </span>
-                </button>
-                <button
-                  className="group w-full h-10 border rounded-md relative flex justify-center items-center hover:border-[#4E61FF] transition-colors"
-                  onClick={() => handleEmailSignup()}
-                >
-                  <div className="w-10 h-10 aspect-square absolute left-0 flex justify-center items-center text-gray-600 group-hover:text-[#4E61FF] transition-colors">
+                  }
+                />
+                <FullButton
+                  onClick={handleEmailSignup}
+                  text="이메일로 회원가입"
+                  bgColor="white"
+                  icon={
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -112,11 +110,8 @@ export default function Signup() {
                         d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
                       />
                     </svg>
-                  </div>
-                  <span className="text-sm text-gray-600 group-hover:text-[#4E61FF] transition-colors">
-                    이메일로 회원가입
-                  </span>
-                </button>
+                  }
+                />
               </div>
             </>
           )}
