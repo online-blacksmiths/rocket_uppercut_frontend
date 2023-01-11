@@ -27,9 +27,9 @@ export default function Signup() {
 
   return (
     <Layout title={pathname ? '회원가입' : null}>
-      <section className="w-full flex justify-between my-20">
+      <section className="w-full h-[510px] flex justify-between mt-20 mb-40">
         <img src={signup} alt="signup" className="px-20" />
-        <article className="w-full flex flex-col px-20 justify-center space-y-3">
+        <article className="w-full h-[680px] flex flex-col px-20 space-y-3">
           <h2 className="text-3xl">일로 연결되는 사람들,</h2>
           <h1 className="text-3xl font-bold">로켓어퍼컷</h1>
           <div className="flex space-x-1">
@@ -79,13 +79,13 @@ export default function Signup() {
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke-width="1.5"
+                      strokeWidth="1.5"
                       stroke="currentColor"
                       className="w-5 h-5"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
                       />
                     </svg>
@@ -100,13 +100,13 @@ export default function Signup() {
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke-width="1.5"
+                      strokeWidth="1.5"
                       stroke="currentColor"
                       className="w-5 h-5"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
                       />
                     </svg>

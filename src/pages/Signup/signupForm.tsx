@@ -26,6 +26,10 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
     setShowDropdown(false);
   };
 
+  const handleChangeForm = () => {
+    setIsForm(false);
+  };
+
   return (
     <div className="flex flex-col">
       <div>
@@ -70,14 +74,14 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
           </div>
         ) : (
           //! 이메일
-          <div>email</div>
+          <TextInput type="email" placeholder="이메일" />
         )}
         <TextInput type="password" placeholder="비밀번호" />
         <div className="grid grid-cols-2 gap-2">
           <TextInput type="text" placeholder="성" />
           <TextInput type="text" placeholder="이름" />
         </div>
-        <div className="space-y-2 flex justify-between items-baseline">
+        <div className="pb-5 space-y-2 flex justify-between items-baseline ">
           <div className="flex flex-col space-y-3">
             <Checkbox id="terms" isChecked={termsAgree} setIsChecked={setTermsAgree} text="이용 약관 동의" />
             <Checkbox
@@ -92,14 +96,20 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
             <span className="text-sm underline">보기</span>
           </div>
         </div>
-        <FullButton
-          type="submit"
-          onClick={() => {
-            console.log('test');
-          }}
-          text="회원가입"
-          bgColor="blue"
-        />
+        <div className="flex flex-col gap-6">
+          <FullButton
+            type="submit"
+            onClick={() => {
+              console.log('test');
+            }}
+            text="회원가입"
+            bgColor="blue"
+          />
+          <div className="border-t mx-10 relative flex justify-center">
+            <span className="absolute -top-3 px-4 text-sm text-gray-500 bg-white">or</span>
+          </div>
+          <FullButton type="button" onClick={handleChangeForm} text="SNS로 회원가입" bgColor="white" />
+        </div>
       </form>
     </div>
   );
