@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import signup from 'assets/create.svg';
@@ -34,7 +34,7 @@ export default function Signup() {
           <h1 className="text-3xl font-bold">로켓어퍼컷</h1>
           <div className="flex space-x-1">
             <span className="text-sm text-[#28323c]">이미 회원이신가요?</span>
-            <Link to="/login" className="text-sm text-[#4E61FF] ">
+            <Link to="/login" className="text-sm text-[#4E61FF]">
               로그인
             </Link>
           </div>

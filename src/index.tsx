@@ -1,17 +1,26 @@
 import { StrictMode } from 'react';
-import { BrowserRouter } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
+import './service/config';
+
 import App from './App';
 import './style/globals.css';
-import { HelmetProvider } from 'react-helmet-async';
+
+const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <StrictMode>
-    <HelmetProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <HelmetProvider>
+        <BrowserRouter>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <App />
+        </BrowserRouter>
+      </HelmetProvider>
+    </QueryClientProvider>
   </StrictMode>,
 );

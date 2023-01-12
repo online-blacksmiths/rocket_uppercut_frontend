@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useMutation } from 'react-query';
+import axios from 'axios';
 
-import { SignupProps } from './types';
+import { SignupInputTypes, SignupMutateDataType, SignupProps, SignupResTypes } from './types';
 import useSignup from './hook/useSignup';
-
+import useSignupForm from './hook/useSignupForm';
 import allCountry, { iso2FlagEmoji } from 'utils/allCountry';
+import { regExp } from 'utils/regExp';
+
 import TextInput from 'components/TextInput';
 import Checkbox from 'components/Checkbox';
 import FullButton from 'components/FullButton';
+import useOnSubmit from 'components/hook/useOnSubmit';
 
 export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
   const [selectedDialCode, setSelectedDialCode] = useState<string>('+82');
@@ -14,21 +19,80 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [termsAgree, setTermsAgree] = useState<boolean>(false);
   const [privacyAgree, setPrivacyAgree] = useState<boolean>(false);
+  const [phone, setPhone] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [mutateData, setMutateData] = useState<SignupMutateDataType>({
+    password: '',
+    first_name: '',
+    last_name: '',
+    is_terms_of_service: false,
+    is_privacy_statement: false,
+  });
+
+  const [input, setInput] = useState<SignupInputTypes>({
+    password: '',
+    firstName: '',
+    lastName: '',
+  });
+
   const { handleChangeType } = useSignup({ type, setType, setIsForm });
 
-  const handleDropdown = () => {
-    setShowDropdown(prev => !prev);
-  };
+  const { handleDropdown, handleChangeTel, handleChangeForm, handleChangeInput, handleChangeId } = useSignupForm({
+    setIsForm,
+    setShowDropdown,
+    setSelectedDialCode,
+    setSelectedIso,
+    input,
+    setInput,
+    type,
+    setPhone,
+    setEmail,
+  });
 
-  const handleChangeTel = (dialCode: string, iso: string) => {
-    setSelectedDialCode(`+${dialCode}`);
-    setSelectedIso(iso);
-    setShowDropdown(false);
-  };
+  const { mutate, isLoading, data, error } = useMutation('signupPhone', async () => {
+    if (input.password.search(regExp) < 0) {
+      alert('비밀번호 형식이 올바르지 않습니다.');
+      return;
+    }
 
-  const handleChangeForm = () => {
-    setIsForm(false);
-  };
+    if (type === 'email') {
+      alert('API 준비중');
+      return;
+    }
+
+    try {
+      await axios.post<SignupResTypes>(`/api/v1/user/signup/${type === 'phone' ? 'phone' : 'email'}`, mutateData);
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
+  const { onSubmit } = useOnSubmit(mutate);
+
+  useEffect(() => {
+    const { password, firstName: first_name, lastName: last_name } = input;
+
+    if (type === 'phone') {
+      setMutateData({
+        phone: `${selectedDialCode}${phone}`,
+        password,
+        first_name,
+        last_name,
+        is_terms_of_service: termsAgree,
+        is_privacy_statement: privacyAgree,
+      });
+      return;
+    }
+
+    setMutateData({
+      email,
+      password,
+      first_name,
+      last_name,
+      is_terms_of_service: termsAgree,
+      is_privacy_statement: privacyAgree,
+    });
+  }, [input, termsAgree, privacyAgree, phone, email, selectedDialCode, type]);
 
   return (
     <div className="flex flex-col">
@@ -37,7 +101,7 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
           <span className="text-xs text-gray-600 underline">{type === 'phone' ? '이메일' : '휴대전화'}로 가입</span>
         </button>
       </div>
-      <form className="mt-1 space-y-2">
+      <form onSubmit={e => onSubmit(e)} className="mt-1 space-y-2">
         {type === 'phone' ? (
           //! 휴대전화
           <div className="w-full flex space-x-2">
@@ -70,16 +134,34 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
                 </ul>
               )}
             </div>
-            <TextInput type="text" placeholder="휴대전화 번호" />
+            <TextInput type="text" onChange={handleChangeId} placeholder="휴대전화 번호" value={phone} />
           </div>
         ) : (
           //! 이메일
-          <TextInput type="email" placeholder="이메일" />
+          <TextInput type="email" onChange={handleChangeId} placeholder="이메일" value={email} />
         )}
-        <TextInput type="password" placeholder="비밀번호" />
+        <TextInput
+          type="password"
+          name="password"
+          onChange={handleChangeInput}
+          placeholder="비밀번호"
+          value={input.password}
+        />
         <div className="grid grid-cols-2 gap-2">
-          <TextInput type="text" placeholder="성" />
-          <TextInput type="text" placeholder="이름" />
+          <TextInput
+            type="text"
+            name="firstName"
+            onChange={handleChangeInput}
+            placeholder="성"
+            value={input.firstName}
+          />
+          <TextInput
+            type="text"
+            name="lastName"
+            onChange={handleChangeInput}
+            placeholder="이름"
+            value={input.lastName}
+          />
         </div>
         <div className="pb-5 space-y-2 flex justify-between items-baseline ">
           <div className="flex flex-col space-y-3">
@@ -97,14 +179,7 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
           </div>
         </div>
         <div className="flex flex-col gap-6">
-          <FullButton
-            type="submit"
-            onClick={() => {
-              console.log('test');
-            }}
-            text="회원가입"
-            bgColor="blue"
-          />
+          <FullButton type="submit" text="회원가입" bgColor="blue" />
           <div className="border-t mx-10 relative flex justify-center">
             <span className="absolute -top-3 px-4 text-sm text-gray-500 bg-white">or</span>
           </div>

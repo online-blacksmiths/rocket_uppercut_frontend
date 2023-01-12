@@ -1,7 +1,7 @@
 import cls from 'utils/className';
 
 type FullButtonProps = {
-  onClick: () => void;
+  onClick?: () => void;
   bgColor: 'white' | 'blue';
   text: string;
   icon?: JSX.Element;
@@ -16,7 +16,7 @@ export default function FullButton({ onClick, bgColor, text, icon, type }: FullB
         'group w-full h-10 border rounded-md relative flex justify-center items-center transition-colors',
         bgColor === 'white' ? 'bg-white hover:border-[#4E61FF]' : 'bg-[#4E61FF] hover:bg-[#344BFF]',
       )}
-      onClick={() => onClick()}
+      onClick={() => onClick !== undefined && onClick()}
     >
       <div
         className={cls(
