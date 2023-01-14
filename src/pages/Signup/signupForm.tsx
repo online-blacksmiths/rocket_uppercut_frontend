@@ -3,7 +3,7 @@ import { useMutation, useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import axios from 'axios';
-import { useCookies } from 'react-cookie';
+import { Cookies } from 'react-cookie';
 import { DateTime } from 'luxon';
 
 import { SignupInputTypes, SignupMutateDataType, SignupProps, SignupResTypes, StepResType } from './types';
@@ -41,7 +41,7 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
   const [email, setEmail] = useRecoilState(emailState);
 
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies(['refreshToken']);
+  const cookies = new Cookies();
 
   const { handleChangeType } = useSignup({ type, setType, setIsForm });
 
@@ -78,8 +78,12 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
     },
     {
       onSuccess: data => {
-        setCookie('refreshToken', data.refresh_token, {
-          expires: DateTime.fromISO(data.refresh_token).toJSDate(),
+        cookies.set('refreshToken', data.refresh_token, {
+          expires: DateTime.fromISO(data.expired_date).toJSDate(),
+        });
+
+        cookies.set('accessToken', data.access_token, {
+          expires: DateTime.fromISO(data.expired_date).toJSDate(),
         });
         setFetch(true);
       },
