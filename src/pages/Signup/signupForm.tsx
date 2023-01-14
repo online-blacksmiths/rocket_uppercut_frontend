@@ -20,6 +20,7 @@ import FullButton from 'components/FullButton';
 export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [termsAgree, setTermsAgree] = useState<boolean>(false);
+  const [fetch, setFetch] = useState<boolean>(false);
   const [privacyAgree, setPrivacyAgree] = useState<boolean>(false);
   const [mutateData, setMutateData] = useState<SignupMutateDataType>({
     password: '',
@@ -77,16 +78,15 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
     },
     {
       onSuccess: data => {
-        console.log('test');
         setCookie('refreshToken', data.refresh_token, {
           expires: DateTime.fromISO(data.refresh_token).toJSDate(),
         });
-        refetch();
+        setFetch(true);
       },
     },
   );
 
-  const { refetch } = useQuery<StepResType>(
+  useQuery<StepResType>(
     'getStep',
     async () => {
       if (signupData === undefined) return;
@@ -102,7 +102,7 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
       }
     },
     {
-      enabled: false,
+      enabled: fetch,
       onSuccess: (data: StepResType) => {
         localStorage.setItem('step', JSON.stringify(data));
 

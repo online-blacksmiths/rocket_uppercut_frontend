@@ -6,15 +6,17 @@ type FullButtonProps = {
   text: string;
   icon?: JSX.Element;
   type?: string;
+  disable?: boolean;
 };
 
-export default function FullButton({ onClick, bgColor, text, icon, type }: FullButtonProps) {
+export default function FullButton({ onClick, bgColor, text, icon, type, disable }: FullButtonProps) {
   return (
     <button
       type={type === 'submit' ? 'submit' : 'button'}
       className={cls(
         'group w-full h-10 border rounded-md relative flex justify-center items-center transition-colors',
         bgColor === 'white' ? 'bg-white hover:border-[#4E61FF]' : 'bg-[#4E61FF] hover:bg-[#344BFF]',
+        disable === false ? 'opacity-60 cursor-not-allowed' : '',
       )}
       onClick={() => onClick !== undefined && onClick()}
     >
