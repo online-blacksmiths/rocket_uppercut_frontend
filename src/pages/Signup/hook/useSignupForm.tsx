@@ -1,4 +1,7 @@
 import { ChangeEvent } from 'react';
+import { useResetRecoilState } from 'recoil';
+
+import { emailState, phoneState, selectedDialCodeState, selectedIsoState } from 'atom/signup';
 import { SignupFormProps } from '../types';
 
 export default function useSignupForm({
@@ -12,6 +15,11 @@ export default function useSignupForm({
   setPhone,
   setEmail,
 }: SignupFormProps) {
+  const resetDialCode = useResetRecoilState(selectedDialCodeState);
+  const resetIso = useResetRecoilState(selectedIsoState);
+  const resetPhone = useResetRecoilState(phoneState);
+  const resetEmail = useResetRecoilState(emailState);
+
   const handleDropdown = () => {
     setShowDropdown(prev => !prev);
   };
@@ -23,6 +31,10 @@ export default function useSignupForm({
   };
 
   const handleChangeForm = () => {
+    resetDialCode();
+    resetIso();
+    resetPhone();
+    resetEmail();
     setIsForm(false);
   };
 

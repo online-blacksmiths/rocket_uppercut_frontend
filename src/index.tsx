@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { RecoilRoot } from 'recoil';
 import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
@@ -16,10 +17,12 @@ root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
-        <BrowserRouter>
-          <ReactQueryDevtools initialIsOpen={false} />
-          <App />
-        </BrowserRouter>
+        <RecoilRoot>
+          <BrowserRouter>
+            <ReactQueryDevtools initialIsOpen={false} />
+            <App />
+          </BrowserRouter>
+        </RecoilRoot>
       </HelmetProvider>
     </QueryClientProvider>
   </StrictMode>,

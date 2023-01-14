@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import { DateTime } from 'luxon';
@@ -10,20 +11,16 @@ import useSignup from './hook/useSignup';
 import useSignupForm from './hook/useSignupForm';
 import allCountry, { iso2FlagEmoji } from 'utils/allCountry';
 import { regExp } from 'utils/regExp';
+import { selectedDialCodeState, phoneState, emailState, selectedIsoState } from 'atom/signup';
 
 import TextInput from 'components/TextInput';
 import Checkbox from 'components/Checkbox';
 import FullButton from 'components/FullButton';
 
 export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
-  const [selectedDialCode, setSelectedDialCode] = useState<string>('+82');
-  const [selectedIso, setSelectedIso] = useState<string>('kr');
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [termsAgree, setTermsAgree] = useState<boolean>(false);
   const [privacyAgree, setPrivacyAgree] = useState<boolean>(false);
-  const [phone, setPhone] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [fetch, setFetch] = useState<boolean>(false);
   const [mutateData, setMutateData] = useState<SignupMutateDataType>({
     password: '',
     first_name: '',
@@ -31,12 +28,16 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
     is_terms_of_service: false,
     is_privacy_statement: false,
   });
-
   const [input, setInput] = useState<SignupInputTypes>({
     password: '',
     firstName: '',
     lastName: '',
   });
+
+  const [selectedDialCode, setSelectedDialCode] = useRecoilState(selectedDialCodeState);
+  const [selectedIso, setSelectedIso] = useRecoilState(selectedIsoState);
+  const [phone, setPhone] = useRecoilState(phoneState);
+  const [email, setEmail] = useRecoilState(emailState);
 
   const navigate = useNavigate();
   const [cookies, setCookie] = useCookies(['refreshToken']);
@@ -76,15 +77,16 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
     },
     {
       onSuccess: data => {
+        console.log('test');
         setCookie('refreshToken', data.refresh_token, {
           expires: DateTime.fromISO(data.refresh_token).toJSDate(),
         });
-        setFetch(true);
+        refetch();
       },
     },
   );
 
-  useQuery<StepResType>(
+  const { refetch } = useQuery<StepResType>(
     'getStep',
     async () => {
       if (signupData === undefined) return;
@@ -100,7 +102,7 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
       }
     },
     {
-      enabled: fetch,
+      enabled: false,
       onSuccess: (data: StepResType) => {
         localStorage.setItem('step', JSON.stringify(data));
 
@@ -110,12 +112,12 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
         }
 
         if (!data.step_2) {
-          navigate('/step2')
+          navigate('/step2');
           return;
         }
 
         if (!data.step_3) {
-          navigate('/step3')
+          navigate('/step3');
         }
       },
     },
@@ -173,7 +175,7 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
                 <span className="text-xs text-gray-500">▼</span>
               </button>
               {showDropdown && (
-                <ul className="absolute min-w-[310px] w-full h-80 overflow-y-scroll border bg-white rounded-md ">
+                <ul className="absolute min-w-[310px] w-full h-80 overflow-y-scroll border bg-white rounded-md z-10">
                   {allCountry().map(item => (
                     <li
                       onClick={() => {
