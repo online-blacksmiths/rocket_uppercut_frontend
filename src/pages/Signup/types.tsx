@@ -23,6 +23,13 @@ export type SignupResTypes = {
   expired_date: string;
 };
 
+export type StepResType = {
+  type: 'PHONE' | 'EMAIL';
+  step_1: boolean;
+  step_2: boolean;
+  step_3: boolean;
+};
+
 export type SignupInputTypes = {
   password: string;
   firstName: string;

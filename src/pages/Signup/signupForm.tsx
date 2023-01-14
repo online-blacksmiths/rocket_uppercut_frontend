@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useMutation } from 'react-query';
+import { FormEvent, useEffect, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useCookies } from 'react-cookie';
+import { DateTime } from 'luxon';
 
-import { SignupInputTypes, SignupMutateDataType, SignupProps, SignupResTypes } from './types';
+import { SignupInputTypes, SignupMutateDataType, SignupProps, SignupResTypes, StepResType } from './types';
 import useSignup from './hook/useSignup';
 import useSignupForm from './hook/useSignupForm';
 import allCountry, { iso2FlagEmoji } from 'utils/allCountry';
@@ -11,7 +14,6 @@ import { regExp } from 'utils/regExp';
 import TextInput from 'components/TextInput';
 import Checkbox from 'components/Checkbox';
 import FullButton from 'components/FullButton';
-import useOnSubmit from 'components/hook/useOnSubmit';
 
 export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
   const [selectedDialCode, setSelectedDialCode] = useState<string>('+82');
@@ -21,6 +23,7 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
   const [privacyAgree, setPrivacyAgree] = useState<boolean>(false);
   const [phone, setPhone] = useState<string>('');
   const [email, setEmail] = useState<string>('');
+  const [fetch, setFetch] = useState<boolean>(false);
   const [mutateData, setMutateData] = useState<SignupMutateDataType>({
     password: '',
     first_name: '',
@@ -34,6 +37,9 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
     firstName: '',
     lastName: '',
   });
+
+  const navigate = useNavigate();
+  const [cookies, setCookie] = useCookies(['refreshToken']);
 
   const { handleChangeType } = useSignup({ type, setType, setIsForm });
 
@@ -49,25 +55,76 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
     setEmail,
   });
 
-  const { mutate, isLoading, data, error } = useMutation('signupPhone', async () => {
-    if (input.password.search(regExp) < 0) {
-      alert('비밀번호 형식이 올바르지 않습니다.');
-      return;
-    }
+  const { mutate, data: signupData } = useMutation<SignupResTypes>(
+    async () => {
+      if (input.password.search(regExp) < 0) {
+        alert('비밀번호 형식이 올바르지 않습니다.');
+        return;
+      }
 
-    if (type === 'email') {
-      alert('API 준비중');
-      return;
-    }
+      if (type === 'email') {
+        alert('API 준비중');
+        return;
+      }
 
-    try {
-      await axios.post<SignupResTypes>(`/api/v1/user/signup/${type === 'phone' ? 'phone' : 'email'}`, mutateData);
-    } catch (err) {
-      console.log(err);
-    }
-  });
+      try {
+        const res = await axios.post(`/api/v1/user/signup/${type === 'phone' ? 'phone' : 'email'}`, mutateData);
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    {
+      onSuccess: data => {
+        setCookie('refreshToken', data.refresh_token, {
+          expires: DateTime.fromISO(data.refresh_token).toJSDate(),
+        });
+        setFetch(true);
+      },
+    },
+  );
 
-  const { onSubmit } = useOnSubmit(mutate);
+  useQuery<StepResType>(
+    'getStep',
+    async () => {
+      if (signupData === undefined) return;
+      try {
+        const res = await axios.get('/api/v1/user/verify/step', {
+          headers: {
+            Authorization: signupData.access_token,
+          },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      enabled: fetch,
+      onSuccess: (data: StepResType) => {
+        localStorage.setItem('step', JSON.stringify(data));
+
+        if (!data.step_1) {
+          navigate('/step1');
+          return;
+        }
+
+        if (!data.step_2) {
+          navigate('/step2')
+          return;
+        }
+
+        if (!data.step_3) {
+          navigate('/step3')
+        }
+      },
+    },
+  );
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    mutate();
+  };
 
   useEffect(() => {
     const { password, firstName: first_name, lastName: last_name } = input;

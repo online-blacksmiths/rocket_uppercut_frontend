@@ -13,6 +13,7 @@
     "axios": "^1.2.2",
     "luxon": "^3.2.1",
     "react": "^18.2.0",
+    "react-cookie": "^4.1.1",
     "react-dom": "^18.2.0",
     "react-helmet-async": "^1.3.0",
     "react-query": "^3.39.2",
@@ -22,7 +23,7 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "start": "export PORT=6100 react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -46,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/luxon": "^3.2.0",
     "autoprefixer": "^10.4.13",
     "dotenv": "^16.0.3",
     "postcss": "^8.4.21",
