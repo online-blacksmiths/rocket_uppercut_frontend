@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQuery } from 'react-query';
 import { Cookies } from 'react-cookie';
 import axios from 'axios';
 
@@ -14,6 +15,8 @@ import FullButton from 'components/FullButton';
 export default function Step1() {
   const [timer, setTimer] = useState<string>('5:00');
   const [deadline, setDeadline] = useState<number>(new Date().setSeconds(new Date().getSeconds() + 300));
+  const [authCode, setAuthCode] = useState<string>('');
+  const [fetch, setFetch] = useState<boolean>(false);
   const dialCode = useRecoilValue(selectedDialCodeState);
   const phone = useRecoilValue(phoneState);
   const email = useRecoilValue(emailState);
@@ -21,6 +24,8 @@ export default function Step1() {
   const localData: StepResType = JSON.parse(localStorage.getItem('step') || '');
 
   const cookies = new Cookies();
+  const navigate = useNavigate();
+  const accessToken = cookies.get('accessToken');
 
   const handleGetAuthCode = () => {
     const newDate = new Date();
@@ -28,10 +33,8 @@ export default function Step1() {
     setDeadline(newDate.setSeconds(newDate.getSeconds() + 300));
   };
 
-  console.log(cookies.get('accessToken'));
-
   useQuery(
-    'getAuth',
+    'requestAuthCode',
     async () => {
       try {
         const res = await axios.get('/api/v1/user/verify/phone', {
@@ -46,6 +49,79 @@ export default function Step1() {
       enabled: false,
     },
   );
+
+  const { mutate, status } = useMutation<{ message: string }>(
+    async () => {
+      try {
+        console.log(authCode, 'request');
+        const res = await axios.post(
+          '/api/v1/user/verify/phone',
+          {
+            verify_code: authCode,
+          },
+          {
+            headers: accessToken,
+          },
+        );
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    {
+      onSuccess: () => {
+        if (status === 'success') {
+          setFetch(true);
+        }
+      },
+    },
+  );
+
+  useQuery<StepResType>(
+    'getStep',
+    async () => {
+      try {
+        const res = await axios.get('/api/v1/user/verify/step', {
+          headers: {
+            Authorization: accessToken,
+          },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      enabled: fetch,
+      onSuccess: (data: StepResType) => {
+        localStorage.setItem('step', JSON.stringify(data));
+
+        if (!data.step_2) {
+          navigate('/step2');
+          return;
+        }
+
+        if (!data.step_3) {
+          navigate('/step3');
+          return;
+        }
+      },
+    },
+  );
+
+  const handleAuthorization = () => {
+    mutate();
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length === 0) {
+      setAuthCode('');
+    }
+
+    if (/([\d])/.exec(e.target.value) !== null && e.target.value.length <= 6) {
+      setAuthCode(e.target.value);
+    }
+  };
 
   useEffect(() => {
     const countdown = setInterval(() => {
@@ -79,6 +155,8 @@ export default function Step1() {
                 type="text"
                 placeholder="인증 번호 6자리 입력"
                 className="w-full h-10 border rounded-md py-3 px-4 outline-none text-sm"
+                value={authCode}
+                onChange={e => handleChange(e)}
               />
               <div className="absolute right-4 text-sm text-[#ff5165]">{timer}</div>
             </div>
@@ -92,7 +170,12 @@ export default function Step1() {
                 <p>다시받기</p>
               </button>
             </div>
-            <FullButton bgColor="blue" text="인증" disable={timer === '0:00' ? false : true} />
+            <FullButton
+              onClick={handleAuthorization}
+              bgColor="blue"
+              text="인증"
+              disable={timer === '0:00' ? false : true}
+            />
           </article>
         ) : (
           <div>Email Step 1</div>

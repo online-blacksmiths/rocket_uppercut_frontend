@@ -122,6 +122,7 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
 
         if (!data.step_3) {
           navigate('/step3');
+          return;
         }
       },
     },
