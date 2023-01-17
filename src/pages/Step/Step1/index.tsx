@@ -31,14 +31,17 @@ export default function Step1() {
     const newDate = new Date();
     setTimer('5:00');
     setDeadline(newDate.setSeconds(newDate.getSeconds() + 300));
+    refetch();
   };
 
-  useQuery(
+  const { refetch } = useQuery(
     'requestAuthCode',
     async () => {
       try {
         const res = await axios.get('/api/v1/user/verify/phone', {
-          headers: cookies.get('accessToken'),
+          headers: {
+            Authorization: accessToken,
+          },
         });
         return res.data;
       } catch (error) {
@@ -46,7 +49,9 @@ export default function Step1() {
       }
     },
     {
-      enabled: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
     },
   );
 
@@ -60,7 +65,9 @@ export default function Step1() {
             verify_code: authCode,
           },
           {
-            headers: accessToken,
+            headers: {
+              Authorization: accessToken,
+            },
           },
         );
         return res.data;
