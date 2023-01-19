@@ -5,6 +5,7 @@ import Navigator from 'components/Navigator';
 import TextInput from 'components/TextInput';
 import { ChangeEvent, useState } from 'react';
 import FullButton from 'components/FullButton';
+import { Link } from 'react-router-dom';
 
 type userInputType = {
   id: string;
@@ -58,6 +59,13 @@ export default function Login() {
             </span>
             <FullButton type="submit" bgColor="blue" text="로그인" />
           </form>
+          <div className="w-full border-b border-gray-300 my-4" />
+          <div className="flex text-sm justify-center text-[#28323c] space-x-1">
+            <span>회원이 아니신가요?</span>
+            <Link to="/signup" className="text-[#4e61ff] underline">
+              회원가입
+            </Link>
+          </div>
         </article>
       </section>
     </Layout>
