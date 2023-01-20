@@ -37,6 +37,7 @@ export default function Step1() {
   const { refetch } = useQuery(
     'requestAuthCode',
     async () => {
+      console.log('인증번호 요청');
       try {
         const res = await axios.get('/api/v1/user/verify/phone', {
           headers: {
@@ -140,6 +141,10 @@ export default function Step1() {
     }, 1000);
     return () => clearInterval(countdown);
   }, [deadline]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <Layout title="회원가입">
