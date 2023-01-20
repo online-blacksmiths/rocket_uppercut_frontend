@@ -1,5 +1,7 @@
 import Layout from 'common/Layout';
 import login from 'assets/login.svg';
+import google from 'assets/google.svg';
+import facebook from 'assets/facebook_login.svg';
 
 import Navigator from 'components/Navigator';
 import TextInput from 'components/TextInput';
@@ -59,6 +61,27 @@ export default function Login() {
             </span>
             <FullButton type="submit" bgColor="blue" text="로그인" />
           </form>
+          <div className="relative border-b border-gray-300 my-4 flex justify-center mx-10">
+            <span className="absolute -bottom-2.5 bg-white text-sm text-gray-400 px-5">or</span>
+          </div>
+          <div className="flex flex-col my-2 gap-2">
+            <button
+              type="button"
+              className="group w-full h-10 border rounded-md relative flex justify-center items-center transition-colors bg-white hover:border-[#4E61FF]"
+            >
+              <img src={google} alt="google" className="w-5 h-5 pr-1" />
+              <span className="text-sm transition-colors text-gray-600 group-hover:text-[#4E61FF]">구글로 로그인</span>
+            </button>
+            <button
+              type="button"
+              className="group w-full h-10 border rounded-md relative flex justify-center items-center transition-colors bg-white hover:border-[#4E61FF]"
+            >
+              <img src={facebook} alt="facebook" className="w-4 h-4 pr-1" />
+              <span className="text-sm transition-colors text-gray-600 group-hover:text-[#4E61FF]">
+                페이스북으로 로그인
+              </span>
+            </button>
+          </div>
           <div className="w-full border-b border-gray-300 my-4" />
           <div className="flex text-sm justify-center text-[#28323c] space-x-1">
             <span>회원이 아니신가요?</span>
