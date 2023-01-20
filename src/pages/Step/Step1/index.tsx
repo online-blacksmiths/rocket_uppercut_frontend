@@ -37,7 +37,8 @@ export default function Step1() {
   const { refetch } = useQuery(
     'requestAuthCode',
     async () => {
-      console.log('인증번호 요청');
+      if (localData.type === 'EMAIL') return;
+
       try {
         const res = await axios.get('/api/v1/user/verify/phone', {
           headers: {
@@ -56,10 +57,9 @@ export default function Step1() {
     },
   );
 
-  const { mutate, status } = useMutation<{ message: string }>(
+  const { mutate: phoneAuth, status } = useMutation<{ message: string }>(
     async () => {
       try {
-        console.log(authCode, 'request');
         const res = await axios.post(
           '/api/v1/user/verify/phone',
           {
@@ -118,7 +118,12 @@ export default function Step1() {
   );
 
   const handleAuthorization = () => {
-    mutate();
+    if (localData.type === 'PHONE') {
+      phoneAuth();
+      return;
+    }
+
+    
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
