@@ -33,12 +33,15 @@ export default function Step1() {
     setDeadline(newDate.setSeconds(newDate.getSeconds() + 300));
   };
 
-  useQuery(
+  const { refetch } = useQuery(
     'requestAuthCode',
     async () => {
+      console.log('인증번호 요청');
       try {
         const res = await axios.get('/api/v1/user/verify/phone', {
-          headers: cookies.get('accessToken'),
+          headers: {
+            Authorization: cookies.get('accessToken'),
+          },
         });
         return res.data;
       } catch (error) {
@@ -60,7 +63,9 @@ export default function Step1() {
             verify_code: authCode,
           },
           {
-            headers: accessToken,
+            headers: {
+              Authorization: accessToken,
+            },
           },
         );
         return res.data;
@@ -133,6 +138,10 @@ export default function Step1() {
     }, 1000);
     return () => clearInterval(countdown);
   }, [deadline]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <Layout title="회원가입">
