@@ -10,7 +10,7 @@ import { SignupInputTypes, SignupMutateDataType, SignupProps, SignupResTypes, St
 import useSignup from './hook/useSignup';
 import useSignupForm from './hook/useSignupForm';
 import allCountry, { iso2FlagEmoji } from 'utils/allCountry';
-import { regExp } from 'utils/regExp';
+import { passwordRegExp, emailRegExp } from 'utils/regExp';
 import { selectedDialCodeState, phoneState, emailState, selectedIsoState } from 'atom/signup';
 
 import TextInput from 'components/TextInput';
@@ -59,22 +59,22 @@ export default function SignupForm({ type, setType, setIsForm }: SignupProps) {
 
   const { mutate, data: signupData } = useMutation<SignupResTypes>(
     async () => {
-      if (input.password.search(regExp) < 0) {
+      if (input.password.search(passwordRegExp) < 0) {
         alert('비밀번호 형식이 올바르지 않습니다.');
         return;
       }
 
-      if (type === 'email') {
-        alert('API 준비중');
+      if (email.search(emailRegExp) < 0) {
+        alert('이메일 형식이 올바르지 않습니다.');
         return;
       }
-
-      try {
-        const res = await axios.post(`/api/v1/user/signup/${type === 'phone' ? 'phone' : 'email'}`, mutateData);
-        return res.data;
-      } catch (error) {
-        console.log(error);
-      }
+      
+        try {
+          const res = await axios.post(`/api/v1/user/signup/${type === 'phone' ? 'phone' : 'email'}`, mutateData);
+          return res.data;
+        } catch (error) {
+          console.log(error);
+        }
     },
     {
       onSuccess: data => {

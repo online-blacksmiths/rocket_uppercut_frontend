@@ -27,19 +27,36 @@ export default function Step1() {
   const navigate = useNavigate();
   const accessToken = cookies.get('accessToken');
 
-  const handleGetAuthCode = () => {
-    const newDate = new Date();
-    setTimer('5:00');
-    setDeadline(newDate.setSeconds(newDate.getSeconds() + 300));
-    refetch();
-  };
-
-  const { refetch } = useQuery(
-    'requestAuthCode',
+  const { refetch: reqPhoneAuthCode } = useQuery(
+    'requestPhoneAuthCode',
     async () => {
-      console.log('인증번호 요청');
+      if (localData.type === 'EMAIL') return;
+
       try {
         const res = await axios.get('/api/v1/user/verify/phone', {
+          headers: {
+            Authorization: accessToken,
+          },
+        });
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+    },
+  );
+
+  const { refetch: reqEmailAuthCode } = useQuery(
+    'requestEmailAuthCode',
+    async () => {
+      if (localData.type === 'PHONE') return;
+
+      try {
+        const res = await axios.get('/api/v1/user/verify/email', {
           headers: {
             Authorization: accessToken,
           },
@@ -59,7 +76,6 @@ export default function Step1() {
   const { mutate, status } = useMutation<{ message: string }>(
     async () => {
       try {
-        console.log(authCode, 'request');
         const res = await axios.post(
           '/api/v1/user/verify/phone',
           {
@@ -117,6 +133,18 @@ export default function Step1() {
     },
   );
 
+  const handleGetAuthCode = () => {
+    if (localData.type === 'PHONE') {
+      const newDate = new Date();
+      setTimer('5:00');
+      setDeadline(newDate.setSeconds(newDate.getSeconds() + 300));
+      reqPhoneAuthCode();
+      return;
+    }
+
+    reqEmailAuthCode();
+  };
+
   const handleAuthorization = () => {
     mutate();
   };
@@ -143,11 +171,12 @@ export default function Step1() {
   }, [deadline]);
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    if (localData.type === 'PHONE') reqPhoneAuthCode();
+    if (localData.type === 'EMAIL') reqEmailAuthCode();
+  }, [localData.type, reqPhoneAuthCode, reqEmailAuthCode]);
 
   return (
-    <Layout title="회원가입">
+    <Layout title="인증">
       <section className="w-[700px] flex flex-col items-center">
         <StepNav />
         {localData.type === 'PHONE' ? (
@@ -190,7 +219,21 @@ export default function Step1() {
             />
           </article>
         ) : (
-          <div>Email Step 1</div>
+          <article className="flex flex-col justify-center">
+            <p className="mt-10 mb-5 text-center text-xl text-[#28323c]">이메일 인증</p>
+            <div className="w-[340px] flex flex-col items-center">
+              <span className="text-sm text-[#6e7980]">
+                {email}
+                {'(으)'}로 보내드린 인증 메일을 확인해주세요
+              </span>
+              <div className="flex justify-center my-8">
+                <span className="text-sm text-[#6e7980]">인증 메일을 못 받으셨나요?</span>
+                <button onClick={() => handleGetAuthCode()} className="ml-2 text-sm text-[#4e61ff] hover:underline">
+                  <p>다시받기</p>
+                </button>
+              </div>
+            </div>
+          </article>
         )}
       </section>
     </Layout>
