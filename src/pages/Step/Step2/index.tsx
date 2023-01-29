@@ -1,18 +1,30 @@
+import { useRef, useState } from 'react';
 import userDefaultPhoto from 'assets/user.webp';
 
 import Layout from 'common/Layout';
 import FullButton from 'components/FullButton';
-
 import StepDropdownInput from '../components/StepDropdownInput';
 import StepNav from '../components/StepNav';
 import StepHead from '../components/StepHead';
-import { useState } from 'react';
+import cls from 'utils/className';
+
 import { defaultSkills } from './mock';
+import useCloseClickOutside from 'common/hook/useCloseClickOutside';
+
+const degreeList = ['학사', '전문학사', '석사', '박사', '수료'];
 
 export default function Step2() {
   const [isStudent, setIsStudent] = useState<boolean>(false);
   const [skillList, setSkillList] = useState<string[]>(defaultSkills);
   const [selectSkillList, setSelectSkillList] = useState<string[]>([]);
+  const [showDegreeList, setShowDegreeList] = useState<boolean>(false);
+  const [selectDegree, setSelectDegree] = useState<string>('학사');
+
+  const degreeDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useCloseClickOutside(degreeDropdownRef, () => {
+    setShowDegreeList(false);
+  });
 
   const handleChangeStudentState = () => {
     setIsStudent(prev => !prev);
@@ -30,6 +42,10 @@ export default function Step2() {
     setSelectSkillList(prev => prev.filter(item => item !== skill));
   };
 
+  const handleShowDegreeDropdown = () => {
+    setShowDegreeList(prev => !prev);
+  };
+
   return (
     <Layout title="프로필">
       <StepNav />
@@ -41,7 +57,55 @@ export default function Step2() {
         <img src={userDefaultPhoto} alt="userDefaultPhoto" className="mb-3" />
         <FullButton bgColor="blue" text="사진 등록" />
         {isStudent ? (
-          <></>
+          <div className="w-full flex flex-col space-y-3 mt-5">
+            <div>
+              <StepHead content="학교" isRequire={true} />
+              <StepDropdownInput />
+            </div>
+            <div>
+              <StepHead content="학위" isRequire={true} />
+              <div
+                ref={degreeDropdownRef}
+                onClick={() => handleShowDegreeDropdown()}
+                className="relative flex justify-between items-center h-11 px-3 border text-sm outline-none rounded-md hover:border-[#4e61ff] transition-colors cursor-pointer"
+              >
+                <span className={cls('', showDegreeList ? 'text-[#4e61ff]' : '')}>{selectDegree}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  className={cls('w-4 h-4 transition-transform', showDegreeList ? 'rotate-180' : '')}
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+                <ul
+                  className={cls(
+                    'absolute w-full top-10 origin-top left-0 z-10 bg-white border rounded-md transition-transform transform scale-y-0',
+                    showDegreeList ? 'scale-y-100' : '',
+                  )}
+                >
+                  {degreeList.map((item, index) => (
+                    <li
+                      key={index}
+                      onClick={() => setSelectDegree(item)}
+                      className={cls(
+                        'w-full flex items-center h-11 px-4 text-sm hover:bg-[#00000008]',
+                        selectDegree === item ? 'bg-[#00000008] font-bold' : '',
+                      )}
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div>
+              <StepHead content="전공" isRequire={true} />
+              <StepDropdownInput />
+            </div>
+          </div>
         ) : (
           <div className="w-full flex flex-col space-y-3 mt-5">
             <div>
