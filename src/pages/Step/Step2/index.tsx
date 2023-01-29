@@ -12,6 +12,7 @@ import { defaultSkills } from './mock';
 import useCloseClickOutside from 'common/hook/useCloseClickOutside';
 
 const degreeList = ['학사', '전문학사', '석사', '박사', '수료'];
+const inSchoolList = ['졸업', '재학', '휴학', '중퇴'];
 
 export default function Step2() {
   const [isStudent, setIsStudent] = useState<boolean>(false);
@@ -19,12 +20,11 @@ export default function Step2() {
   const [selectSkillList, setSelectSkillList] = useState<string[]>([]);
   const [showDegreeList, setShowDegreeList] = useState<boolean>(false);
   const [selectDegree, setSelectDegree] = useState<string>('학사');
+  const [showInSchool, setShowInSchool] = useState<boolean>(false);
+  const [inSchool, setInSchool] = useState<string>('');
 
   const degreeDropdownRef = useRef<HTMLDivElement | null>(null);
-
-  useCloseClickOutside(degreeDropdownRef, () => {
-    setShowDegreeList(false);
-  });
+  const inSchoolDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const handleChangeStudentState = () => {
     setIsStudent(prev => !prev);
@@ -45,6 +45,18 @@ export default function Step2() {
   const handleShowDegreeDropdown = () => {
     setShowDegreeList(prev => !prev);
   };
+
+  const handleShowInSchoolDropdown = () => {
+    setShowInSchool(prev => !prev);
+  };
+
+  useCloseClickOutside(degreeDropdownRef, () => {
+    setShowDegreeList(false);
+  });
+
+  useCloseClickOutside(inSchoolDropdownRef, () => {
+    setShowInSchool(false);
+  });
 
   return (
     <Layout title="프로필">
@@ -104,6 +116,58 @@ export default function Step2() {
             <div>
               <StepHead content="전공" isRequire={true} />
               <StepDropdownInput />
+            </div>
+            <div>
+              <StepHead content="재학 기간" isRequire={true} />
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  placeholder="년"
+                  className="w-20 h-11 px-2 border text-sm rounded-md outline-none focus:border-[#4e61ff] transition-colors"
+                />
+                <span>-</span>
+                <input
+                  type="text"
+                  placeholder="년"
+                  className="w-20 h-11 px-2 border text-sm rounded-md outline-none focus:border-[#4e61ff] transition-colors"
+                />
+                <div
+                  ref={inSchoolDropdownRef}
+                  onClick={() => handleShowInSchoolDropdown()}
+                  className="relative flex justify-between items-center w-full h-11 px-3 border text-sm outline-none rounded-md hover:border-[#4e61ff] transition-colors cursor-pointer"
+                >
+                  <span>{inSchool}</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className={cls('w-4 h-4 transition-transform', showInSchool ? 'rotate-180' : '')}
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                  <ul
+                    className={cls(
+                      'absolute w-full top-10 origin-top left-0 z-10 bg-white border rounded-md transition-transform transform scale-y-0',
+                      showInSchool ? 'scale-y-100' : '',
+                    )}
+                  >
+                    {inSchoolList.map((item, index) => (
+                      <li
+                        key={index}
+                        onClick={() => setInSchool(item)}
+                        className={cls(
+                          'w-full flex items-center h-11 px-4 text-sm hover:bg-[#00000008]',
+                          inSchool === item ? 'bg-[#00000008] font-bold' : '',
+                        )}
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
@@ -181,7 +245,11 @@ export default function Step2() {
           </div>
         )}
         <div className="w-full mt-5 space-y-5">
-          <FullButton bgColor="white" text="학생입니다" onClick={handleChangeStudentState} />
+          <FullButton
+            bgColor="white"
+            text={isStudent ? '학생이 아닙니다' : '학생입니다'}
+            onClick={handleChangeStudentState}
+          />
           <FullButton bgColor="blue" text="다음" />
         </div>
       </article>
