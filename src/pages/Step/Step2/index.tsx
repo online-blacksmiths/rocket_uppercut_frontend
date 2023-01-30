@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import useStep2 from './hook/useStep2';
 import userDefaultPhoto from 'assets/user.webp';
 
 import Layout from 'common/Layout';
@@ -7,56 +7,77 @@ import StepDropdownInput from '../components/StepDropdownInput';
 import StepNav from '../components/StepNav';
 import StepHead from '../components/StepHead';
 import cls from 'utils/className';
+import { ChangeEvent, useEffect } from 'react';
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import useDebounce from 'common/hook/useDebounce';
 
-import { defaultSkills } from './mock';
-import useCloseClickOutside from 'common/hook/useCloseClickOutside';
+type SearchDataType = {
+  title: string;
+  code: string;
+  type: string;
+};
+
+type SearchResType = SearchDataType[];
 
 const degreeList = ['학사', '전문학사', '석사', '박사', '수료'];
 const inSchoolList = ['졸업', '재학', '휴학', '중퇴'];
 
 export default function Step2() {
-  const [isStudent, setIsStudent] = useState<boolean>(false);
-  const [skillList, setSkillList] = useState<string[]>(defaultSkills);
-  const [selectSkillList, setSelectSkillList] = useState<string[]>([]);
-  const [showDegreeList, setShowDegreeList] = useState<boolean>(false);
-  const [selectDegree, setSelectDegree] = useState<string>('학사');
-  const [showInSchool, setShowInSchool] = useState<boolean>(false);
-  const [inSchool, setInSchool] = useState<string>('');
+  const {
+    degreeDropdownRef,
+    inSchoolDropdownRef,
+    isStudent,
+    skillList,
+    selectSkillList,
+    showDegreeList,
+    selectDegree,
+    showInSchool,
+    inSchool,
+    position,
+    school,
+    major,
+    company,
+    setSelectDegree,
+    setInSchool,
+    handleChangeStudentState,
+    handleSelectSkill,
+    handleRemoveSkill,
+    handleShowDegreeDropdown,
+    handleShowInSchoolDropdown,
+    handlePositionInput,
+    handleSchoolInput,
+    handleMajorInput,
+    handleCompanyInput,
+  } = useStep2();
 
-  const degreeDropdownRef = useRef<HTMLDivElement | null>(null);
-  const inSchoolDropdownRef = useRef<HTMLDivElement | null>(null);
+  const debouncedPosition = useDebounce(position, 300);
 
-  const handleChangeStudentState = () => {
-    setIsStudent(prev => !prev);
-  };
+  const { refetch } = useQuery(
+    'positionSearch',
+    async () => {
+      try {
+        const res = await axios.get<SearchResType>('/api/v1/search', {
+          params: {
+            limit: 10,
+            type: 'POSITION',
+            query: debouncedPosition,
+          },
+        });
 
-  const handleSelectSkill = (skill: string) => {
-    if (selectSkillList.includes(skill)) {
-      return;
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    {},
+  );
+
+  useEffect(() => {
+    if (!!debouncedPosition) {
+      refetch();
     }
-
-    setSelectSkillList(prev => [...prev, skill]);
-  };
-
-  const handleRemoveSkill = (skill: string) => {
-    setSelectSkillList(prev => prev.filter(item => item !== skill));
-  };
-
-  const handleShowDegreeDropdown = () => {
-    setShowDegreeList(prev => !prev);
-  };
-
-  const handleShowInSchoolDropdown = () => {
-    setShowInSchool(prev => !prev);
-  };
-
-  useCloseClickOutside(degreeDropdownRef, () => {
-    setShowDegreeList(false);
-  });
-
-  useCloseClickOutside(inSchoolDropdownRef, () => {
-    setShowInSchool(false);
-  });
+  }, [debouncedPosition, refetch]);
 
   return (
     <Layout title="프로필">
@@ -72,7 +93,7 @@ export default function Step2() {
           <div className="w-full flex flex-col space-y-3 mt-5">
             <div>
               <StepHead content="학교" isRequire={true} />
-              <StepDropdownInput />
+              <StepDropdownInput value={school} onChange={() => handleSchoolInput} />
             </div>
             <div>
               <StepHead content="학위" isRequire={true} />
@@ -115,7 +136,7 @@ export default function Step2() {
             </div>
             <div>
               <StepHead content="전공" isRequire={true} />
-              <StepDropdownInput />
+              <StepDropdownInput value={major} onChange={() => handleMajorInput} />
             </div>
             <div>
               <StepHead content="재학 기간" isRequire={true} />
@@ -174,11 +195,11 @@ export default function Step2() {
           <div className="w-full flex flex-col space-y-3 mt-5">
             <div>
               <StepHead content="최근 포지션" isRequire={true} />
-              <StepDropdownInput />
+              <StepDropdownInput value={position} onChange={handlePositionInput} />
             </div>
             <div>
               <StepHead content="가장 최근에 다닌 회사" isRequire={true} />
-              <StepDropdownInput />
+              <StepDropdownInput value={company} onChange={() => handleCompanyInput} />
             </div>
           </div>
         )}
@@ -241,7 +262,7 @@ export default function Step2() {
         ) : (
           <div className="w-full">
             <StepHead content="학교" isRequire={false} />
-            <StepDropdownInput />
+            <StepDropdownInput value={school} onChange={() => handleSchoolInput} />
           </div>
         )}
         <div className="w-full mt-5 space-y-5">
