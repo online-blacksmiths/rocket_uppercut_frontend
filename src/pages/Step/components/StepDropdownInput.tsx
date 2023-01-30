@@ -1,8 +1,17 @@
-export default function StepDropdownInput() {
+import { ChangeEvent } from 'react';
+
+type SetDropdownInputProps = {
+  value: string;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+};
+
+export default function StepDropdownInput({ value, onChange }: SetDropdownInputProps) {
   return (
     <div className="relative w-full h-11 group">
       <input
         type="text"
+        onChange={e => onChange(e)}
+        value={value}
         className="w-full h-full border text-sm pl-10 outline-none rounded-md focus:border-[#4e61ff] transition-colors"
       />
       <div className="absolute left-0 top-0 w-11 h-11 flex justify-center items-center">
