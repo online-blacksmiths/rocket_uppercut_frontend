@@ -2,7 +2,6 @@ import { ChangeEvent, useRef, useState } from 'react';
 
 import { defaultSkills } from '../mock';
 import useCloseClickOutside from 'common/hook/useCloseClickOutside';
-import useDebounce from 'common/hook/useDebounce';
 
 export default function useStep2() {
   const [isStudent, setIsStudent] = useState<boolean>(false);

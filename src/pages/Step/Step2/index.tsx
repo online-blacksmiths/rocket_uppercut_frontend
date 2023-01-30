@@ -1,3 +1,7 @@
+import { useEffect } from 'react';
+import axios from 'axios';
+import { useQuery } from 'react-query';
+
 import useStep2 from './hook/useStep2';
 import userDefaultPhoto from 'assets/user.webp';
 
@@ -7,9 +11,6 @@ import StepDropdownInput from '../components/StepDropdownInput';
 import StepNav from '../components/StepNav';
 import StepHead from '../components/StepHead';
 import cls from 'utils/className';
-import { ChangeEvent, useEffect } from 'react';
-import { useQuery } from 'react-query';
-import axios from 'axios';
 import useDebounce from 'common/hook/useDebounce';
 
 type SearchDataType = {
@@ -51,7 +52,7 @@ export default function Step2() {
     handleCompanyInput,
   } = useStep2();
 
-  const debouncedPosition = useDebounce(position, 300);
+  const debouncedPosition = useDebounce(position, 500);
 
   const { refetch } = useQuery(
     'positionSearch',
